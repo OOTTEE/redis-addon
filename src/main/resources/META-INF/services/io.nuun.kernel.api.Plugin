@@ -1,1 +1,1 @@
-org.seedstack.seed.persistence.redis.internal.RedisPlugin
+org.seedstack.redis.internal.RedisPlugin

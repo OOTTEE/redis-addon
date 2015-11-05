@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.seedstack.seed.persistence.redis.internal;
+package org.seedstack.redis.internal;
 
 import io.nuun.kernel.api.Plugin;
 import io.nuun.kernel.api.plugin.InitState;
@@ -14,11 +14,10 @@ import io.nuun.kernel.api.plugin.context.InitContext;
 import io.nuun.kernel.api.plugin.request.ClasspathScanRequest;
 import io.nuun.kernel.core.AbstractPlugin;
 import org.apache.commons.configuration.Configuration;
-import org.seedstack.seed.core.api.Application;
-import org.seedstack.seed.core.api.SeedException;
+import org.seedstack.seed.Application;
+import org.seedstack.seed.SeedException;
 import org.seedstack.seed.core.internal.application.ApplicationPlugin;
-import org.seedstack.seed.persistence.redis.api.RedisErrorCodes;
-import org.seedstack.seed.persistence.redis.api.RedisExceptionHandler;
+import org.seedstack.redis.RedisExceptionHandler;
 import org.seedstack.seed.transaction.internal.TransactionPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class RedisPlugin extends AbstractPlugin {
-    public static final String REDIS_PLUGIN_CONFIGURATION_PREFIX = "org.seedstack.seed.persistence.redis";
+    public static final String REDIS_PLUGIN_CONFIGURATION_PREFIX = "org.seedstack.redis";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RedisPlugin.class);
 
@@ -40,7 +39,7 @@ public class RedisPlugin extends AbstractPlugin {
 
     @Override
     public String name() {
-        return "seed-persistence-redis-plugin";
+        return "redis";
     }
 
     @Override
@@ -81,7 +80,8 @@ public class RedisPlugin extends AbstractPlugin {
                 try {
                     exceptionHandlerClasses.put(client, (Class<? extends RedisExceptionHandler>) Class.forName(exceptionHandler));
                 } catch (Exception e) {
-                    throw SeedException.wrap(e, RedisErrorCodes.UNABLE_TO_LOAD_EXCEPTION_HANDLER_CLASS).put("clientName", client).put("exceptionHandlerClass", exceptionHandler);
+                    throw SeedException.wrap(e, RedisErrorCodes.UNABLE_TO_LOAD_EXCEPTION_HANDLER_CLASS)
+                            .put("clientName", client).put("exceptionHandlerClass", exceptionHandler);
                 }
             }
 

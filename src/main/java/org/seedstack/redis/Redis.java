@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.seedstack.seed.persistence.redis.api;
+package org.seedstack.redis;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
@@ -14,7 +14,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation accompanies the {@link org.seedstack.seed.transaction.api.Transactional} annotation to define the
+ * This annotation accompanies the {@link org.seedstack.seed.transaction.Transactional} annotation to define the
  * transaction as a redis one and specify the concerned redis client.
  *
  * @author adrien.lauer@mpsa.com

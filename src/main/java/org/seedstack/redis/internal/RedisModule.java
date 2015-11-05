@@ -5,13 +5,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.seedstack.seed.persistence.redis.internal;
+package org.seedstack.redis.internal;
 
 import com.google.inject.PrivateModule;
 import com.google.inject.name.Names;
 import com.google.inject.util.Providers;
-import org.seedstack.seed.persistence.redis.api.RedisExceptionHandler;
-import org.seedstack.seed.transaction.utils.TransactionalClassProxy;
+import org.seedstack.redis.RedisExceptionHandler;
+import org.seedstack.seed.transaction.spi.TransactionalClassProxy;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.Pipeline;
 import redis.clients.jedis.Transaction;

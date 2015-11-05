@@ -5,13 +5,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.seedstack.seed.persistence.redis;
+package org.seedstack.redis;
 
 import org.junit.Test;
-import org.seedstack.seed.core.api.SeedException;
+import org.seedstack.seed.SeedException;
 import org.seedstack.seed.it.AbstractSeedIT;
-import org.seedstack.seed.persistence.redis.api.Redis;
-import org.seedstack.seed.transaction.api.Transactional;
+import org.seedstack.seed.transaction.Transactional;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.Pipeline;
@@ -24,6 +23,7 @@ import javax.inject.Named;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class RedisIT extends AbstractSeedIT {
+
     @Inject
     Transaction transaction;
 
