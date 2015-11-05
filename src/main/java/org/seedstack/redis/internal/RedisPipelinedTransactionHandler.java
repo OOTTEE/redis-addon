@@ -5,22 +5,21 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.seedstack.seed.persistence.redis.internal;
+package org.seedstack.redis.internal;
 
-import org.seedstack.seed.core.api.SeedException;
-import org.seedstack.seed.persistence.redis.api.RedisErrorCodes;
+import org.seedstack.seed.SeedException;
 import org.seedstack.seed.transaction.spi.TransactionMetadata;
 import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.Transaction;
+import redis.clients.jedis.Pipeline;
 
 import java.io.IOException;
 
 
-class RedisTransactionHandler implements org.seedstack.seed.transaction.spi.TransactionHandler<Transaction> {
-    private final RedisLink<Transaction> redisLink;
+class RedisPipelinedTransactionHandler implements org.seedstack.seed.transaction.spi.TransactionHandler<Pipeline> {
+    private final RedisLink<Pipeline> redisLink;
     private final JedisPool jedisPool;
 
-    RedisTransactionHandler(RedisLink<Transaction> redisLink, JedisPool jedisPool) {
+    RedisPipelinedTransactionHandler(RedisLink<Pipeline> redisLink, JedisPool jedisPool) {
         this.redisLink = redisLink;
         this.jedisPool = jedisPool;
     }
@@ -31,9 +30,10 @@ class RedisTransactionHandler implements org.seedstack.seed.transaction.spi.Tran
     }
 
     @Override
-    public Transaction doCreateTransaction() {
-        RedisLink<Transaction>.Holder holder = this.redisLink.getHolder();
-        holder.attached = holder.jedis.multi();
+    public Pipeline doCreateTransaction() {
+        RedisLink<Pipeline>.Holder holder = this.redisLink.getHolder();
+        holder.attached = holder.jedis.pipelined();
+        holder.attached.multi();
         return holder.attached;
     }
 
@@ -43,27 +43,27 @@ class RedisTransactionHandler implements org.seedstack.seed.transaction.spi.Tran
     }
 
     @Override
-    public void doBeginTransaction(Transaction currentTransaction) {
+    public void doBeginTransaction(Pipeline currentTransaction) {
         // nothing to do (transaction already began)
     }
 
     @Override
-    public void doCommitTransaction(Transaction currentTransaction) {
+    public void doCommitTransaction(Pipeline currentTransaction) {
         currentTransaction.exec();
     }
 
     @Override
-    public void doMarkTransactionAsRollbackOnly(Transaction currentTransaction) {
+    public void doMarkTransactionAsRollbackOnly(Pipeline currentTransaction) {
         // not supported
     }
 
     @Override
-    public void doRollbackTransaction(Transaction currentTransaction) {
+    public void doRollbackTransaction(Pipeline currentTransaction) {
         currentTransaction.clear();
     }
 
     @Override
-    public void doReleaseTransaction(Transaction currentTransaction) {
+    public void doReleaseTransaction(Pipeline currentTransaction) {
         try {
             currentTransaction.close();
         } catch (IOException e) {
@@ -77,8 +77,8 @@ class RedisTransactionHandler implements org.seedstack.seed.transaction.spi.Tran
     }
 
     @Override
-    public Transaction getCurrentTransaction() {
-        RedisLink<Transaction>.Holder holder = this.redisLink.getHolder();
+    public Pipeline getCurrentTransaction() {
+        RedisLink<Pipeline>.Holder holder = this.redisLink.getHolder();
 
         if (holder == null) {
             return null;

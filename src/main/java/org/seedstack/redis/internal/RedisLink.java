@@ -5,10 +5,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.seedstack.seed.persistence.redis.internal;
+package org.seedstack.redis.internal;
 
-import org.seedstack.seed.core.api.SeedException;
-import org.seedstack.seed.persistence.redis.api.RedisErrorCodes;
+import org.seedstack.seed.SeedException;
 import org.seedstack.seed.transaction.spi.TransactionalLink;
 import redis.clients.jedis.Jedis;
 

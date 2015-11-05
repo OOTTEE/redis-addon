@@ -5,11 +5,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package org.seedstack.seed.persistence.redis.api;
+package org.seedstack.redis;
 
 import org.seedstack.seed.transaction.spi.ExceptionHandler;
 import org.seedstack.seed.transaction.spi.TransactionMetadata;
-import redis.clients.jedis.Transaction;
 
 /**
  * Redis flavor of {@link ExceptionHandler}.
