@@ -7,24 +7,22 @@
  */
 package org.seedstack.redis.internal;
 
-import io.nuun.kernel.api.Plugin;
+import com.google.common.collect.Lists;
 import io.nuun.kernel.api.plugin.InitState;
-import io.nuun.kernel.api.plugin.PluginException;
 import io.nuun.kernel.api.plugin.context.InitContext;
 import io.nuun.kernel.api.plugin.request.ClasspathScanRequest;
 import io.nuun.kernel.core.AbstractPlugin;
 import org.apache.commons.configuration.Configuration;
+import org.seedstack.redis.RedisExceptionHandler;
 import org.seedstack.seed.Application;
 import org.seedstack.seed.SeedException;
 import org.seedstack.seed.core.internal.application.ApplicationPlugin;
-import org.seedstack.redis.RedisExceptionHandler;
 import org.seedstack.seed.transaction.internal.TransactionPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,25 +43,9 @@ public class RedisPlugin extends AbstractPlugin {
     @Override
     @SuppressWarnings("unchecked")
     public InitState init(InitContext initContext) {
-        Application application = null;
-        TransactionPlugin transactionPlugin = null;
-        Configuration redisConfiguration = null;
-
-        for (Plugin plugin : initContext.pluginsRequired()) {
-            if (plugin instanceof ApplicationPlugin) {
-                application = ((ApplicationPlugin) plugin).getApplication();
-                redisConfiguration = application.getConfiguration().subset(RedisPlugin.REDIS_PLUGIN_CONFIGURATION_PREFIX);
-            } else if (plugin instanceof TransactionPlugin) {
-                transactionPlugin = (TransactionPlugin) plugin;
-            }
-        }
-
-        if (application == null) {
-            throw new PluginException("Unable to find application plugin");
-        }
-        if (transactionPlugin == null) {
-            throw new PluginException("Unable to find transaction plugin");
-        }
+        Application application = initContext.dependency(ApplicationPlugin.class).getApplication();
+        TransactionPlugin transactionPlugin = initContext.dependency(TransactionPlugin.class);
+        Configuration redisConfiguration = application.getConfiguration().subset(RedisPlugin.REDIS_PLUGIN_CONFIGURATION_PREFIX);
 
         String[] clients = redisConfiguration.getStringArray("clients");
 
@@ -120,11 +102,8 @@ public class RedisPlugin extends AbstractPlugin {
     }
 
     @Override
-    public Collection<Class<? extends Plugin>> requiredPlugins() {
-        Collection<Class<? extends Plugin>> plugins = new ArrayList<Class<? extends Plugin>>();
-        plugins.add(ApplicationPlugin.class);
-        plugins.add(TransactionPlugin.class);
-        return plugins;
+    public Collection<Class<?>> requiredPlugins() {
+        return Lists.<Class<?>>newArrayList(ApplicationPlugin.class, TransactionPlugin.class);
     }
 
     @Override
