@@ -1,6 +1,6 @@
 # SeedStack Redis add-on
 
-[![Build status](https://travis-ci.org/seedstack/redis-addon.svg?branch=master)](https://travis-ci.org/seedstack/redis-addon) [![Coverage Status](https://coveralls.io/repos/seedstack/redis-addon/badge.svg?branch=master)](https://coveralls.io/r/seedstack/redis-addon?branch=master) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.seedstack/seed-redis/badge.svg?style=flat)](https://maven-badges.herokuapp.com/maven-central/org.seedstack/seed-redis)
+[![Build status](https://travis-ci.org/seedstack/redis-addon.svg?branch=master)](https://travis-ci.org/seedstack/redis-addon) [![Coverage Status](https://coveralls.io/repos/seedstack/redis-addon/badge.svg?branch=master)](https://coveralls.io/r/seedstack/redis-addon?branch=master) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.seedstack.addons.redis/redis/badge.svg?style=flat)](https://maven-badges.herokuapp.com/maven-central/org.seedstack.addons.redis/redis)
 
 Official Redis integration for SeedStack.
 
