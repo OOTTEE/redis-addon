@@ -26,6 +26,8 @@
         <jedis.version>2.7.3</jedis.version>
 
         <compatibility.version>1.0.0</compatibility.version>
+
+        <bintray.package>redis-addon</bintray.package>
     </properties>
 
     <build>
