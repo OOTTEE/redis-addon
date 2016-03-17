@@ -22,7 +22,7 @@
     <version>1.0.1-SNAPSHOT</version>
 
     <properties>
-        <seed.version>2.1.0</seed.version>
+        <seed.version>2.3.0-SNAPSHOT</seed.version>
         <jedis.version>2.7.3</jedis.version>
 
         <compatibility.version>1.0.0</compatibility.version>
