@@ -2,9 +2,9 @@
 title: "Basics"
 name: "Redis"
 repo: "https://github.com/seedstack/redis-addon"
-author: "SeedStack"
+date: 2016-02-09
+author: Adrien LAUER
 description: "Provides configuration, injection, transactions and pipelining for Redis through Jedis client."
-min-version: "15.11+"
 backend: true
 weight: -1
 tags:
