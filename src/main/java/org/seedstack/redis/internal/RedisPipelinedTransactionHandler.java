@@ -32,9 +32,10 @@ class RedisPipelinedTransactionHandler implements org.seedstack.seed.transaction
     @Override
     public Pipeline doCreateTransaction() {
         RedisLink<Pipeline>.Holder holder = this.redisLink.getHolder();
-        holder.attached = holder.jedis.pipelined();
-        holder.attached.multi();
-        return holder.attached;
+        Pipeline pipeline = holder.getJedis().pipelined();
+        pipeline.multi();
+        holder.setTransaction(pipeline);
+        return pipeline;
     }
 
     @Override
@@ -83,7 +84,7 @@ class RedisPipelinedTransactionHandler implements org.seedstack.seed.transaction
         if (holder == null) {
             return null;
         } else {
-            return holder.attached;
+            return holder.getTransaction();
         }
     }
 }

@@ -32,8 +32,9 @@ class RedisTransactionHandler implements org.seedstack.seed.transaction.spi.Tran
     @Override
     public Transaction doCreateTransaction() {
         RedisLink<Transaction>.Holder holder = this.redisLink.getHolder();
-        holder.attached = holder.jedis.multi();
-        return holder.attached;
+        Transaction transaction = holder.getJedis().multi();
+        holder.setTransaction(transaction);
+        return transaction;
     }
 
     @Override
@@ -82,7 +83,7 @@ class RedisTransactionHandler implements org.seedstack.seed.transaction.spi.Tran
         if (holder == null) {
             return null;
         } else {
-            return holder.attached;
+            return holder.getTransaction();
         }
     }
 }

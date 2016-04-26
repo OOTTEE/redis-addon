@@ -23,33 +23,50 @@ class RedisLink<T> implements TransactionalLink<T> {
     };
 
     public T get() {
-        Holder holder = this.perThreadObjectContainer.get().peek();
+        Holder holder = perThreadObjectContainer.get().peek();
 
-        if (holder == null || holder.attached == null) {
+        if (holder == null || holder.transaction == null) {
             throw SeedException.createNew(RedisErrorCodes.ACCESSING_REDIS_OUTSIDE_TRANSACTION);
         }
 
-        return holder.attached;
-    }
-
-    void push(Jedis jedis) {
-        this.perThreadObjectContainer.get().push(new Holder(jedis));
-    }
-
-    Jedis pop() {
-        return this.perThreadObjectContainer.get().pop().jedis;
+        return holder.transaction;
     }
 
     Holder getHolder() {
-        return this.perThreadObjectContainer.get().peek();
+        return perThreadObjectContainer.get().peek();
     }
 
-    final class Holder {
-        final Jedis jedis;
-        T attached;
+    void push(Jedis jedis) {
+        perThreadObjectContainer.get().push(new Holder(jedis));
+    }
 
-        Holder(Jedis jedis) {
+    Jedis pop() {
+        Deque<Holder> holders = perThreadObjectContainer.get();
+        Holder holder = holders.pop();
+        if (holders.isEmpty()) {
+            perThreadObjectContainer.remove();
+        }
+        return holder.jedis;
+    }
+
+    class Holder {
+        private final Jedis jedis;
+        private T transaction;
+
+        private Holder(Jedis jedis) {
             this.jedis = jedis;
+        }
+
+        Jedis getJedis() {
+            return jedis;
+        }
+
+        T getTransaction() {
+            return transaction;
+        }
+
+        void setTransaction(T transaction) {
+            this.transaction = transaction;
         }
     }
 }
