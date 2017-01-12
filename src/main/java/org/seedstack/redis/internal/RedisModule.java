@@ -11,7 +11,7 @@ import com.google.inject.PrivateModule;
 import com.google.inject.name.Names;
 import com.google.inject.util.Providers;
 import org.seedstack.redis.RedisExceptionHandler;
-import org.seedstack.seed.transaction.spi.TransactionalClassProxy;
+import org.seedstack.seed.core.internal.transaction.TransactionalClassProxy;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.Pipeline;
 import redis.clients.jedis.Transaction;

@@ -12,8 +12,6 @@ import org.seedstack.seed.transaction.spi.TransactionMetadata;
 
 /**
  * Redis flavor of {@link ExceptionHandler}.
- *
- * @author adrien.lauer@mpsa.com
  */
 public interface RedisExceptionHandler extends ExceptionHandler<Object> {
 

@@ -7,31 +7,24 @@
  */
 package org.seedstack.redis.internal;
 
-import com.google.common.collect.Lists;
+import com.google.common.base.Strings;
 import io.nuun.kernel.api.plugin.InitState;
 import io.nuun.kernel.api.plugin.context.InitContext;
 import io.nuun.kernel.api.plugin.request.ClasspathScanRequest;
-import io.nuun.kernel.core.AbstractPlugin;
-import org.apache.commons.configuration.Configuration;
+import org.seedstack.redis.RedisConfig;
 import org.seedstack.redis.RedisExceptionHandler;
-import org.seedstack.seed.Application;
 import org.seedstack.seed.SeedException;
-import org.seedstack.seed.core.internal.application.ApplicationPlugin;
-import org.seedstack.seed.transaction.internal.TransactionPlugin;
+import org.seedstack.seed.core.internal.AbstractSeedPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RedisPlugin extends AbstractPlugin {
-    public static final String REDIS_PLUGIN_CONFIGURATION_PREFIX = "org.seedstack.redis";
-
+public class RedisPlugin extends AbstractSeedPlugin {
     private static final Logger LOGGER = LoggerFactory.getLogger(RedisPlugin.class);
-
     private final Map<String, JedisPool> jedisPools = new HashMap<String, JedisPool>();
     private final Map<String, Class<? extends RedisExceptionHandler>> exceptionHandlerClasses = new HashMap<String, Class<? extends RedisExceptionHandler>>();
 
@@ -41,47 +34,46 @@ public class RedisPlugin extends AbstractPlugin {
     }
 
     @Override
+    public Collection<ClasspathScanRequest> classpathScanRequests() {
+        return classpathScanRequestBuilder().descendentTypeOf(RedisExceptionHandler.class).build();
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
-    public InitState init(InitContext initContext) {
-        Application application = initContext.dependency(ApplicationPlugin.class).getApplication();
-        TransactionPlugin transactionPlugin = initContext.dependency(TransactionPlugin.class);
-        Configuration redisConfiguration = application.getConfiguration().subset(RedisPlugin.REDIS_PLUGIN_CONFIGURATION_PREFIX);
+    public InitState initialize(InitContext initContext) {
+        RedisConfig redisConfig = getConfiguration(RedisConfig.class);
 
-        String[] clients = redisConfiguration.getStringArray("clients");
-
-        if (clients == null || clients.length == 0) {
+        if (redisConfig.getClients().isEmpty()) {
             LOGGER.info("No Redis client configured, Redis support disabled");
             return InitState.INITIALIZED;
         }
 
-        for (String client : clients) {
-            Configuration clientConfiguration = redisConfiguration.subset("client." + client);
+        for (Map.Entry<String, RedisConfig.ClientConfig> clientEntry : redisConfig.getClients().entrySet()) {
+            String clientName = clientEntry.getKey();
+            RedisConfig.ClientConfig clientConfig = clientEntry.getValue();
 
-            String exceptionHandler = clientConfiguration.getString("exception-handler");
-            if (exceptionHandler != null && !exceptionHandler.isEmpty()) {
-                try {
-                    exceptionHandlerClasses.put(client, (Class<? extends RedisExceptionHandler>) Class.forName(exceptionHandler));
-                } catch (Exception e) {
-                    throw SeedException.wrap(e, RedisErrorCodes.UNABLE_TO_LOAD_EXCEPTION_HANDLER_CLASS)
-                            .put("clientName", client).put("exceptionHandlerClass", exceptionHandler);
-                }
+            Class<? extends RedisExceptionHandler> exceptionHandlerClass = clientConfig.getExceptionHandler();
+            if (exceptionHandlerClass != null) {
+                exceptionHandlerClasses.put(clientName, exceptionHandlerClass);
             }
 
             try {
-                jedisPools.put(client, createJedisPool(clientConfiguration));
+                jedisPools.put(clientName, createJedisPool(clientConfig));
             } catch (Exception e) {
-                throw SeedException.wrap(e, RedisErrorCodes.UNABLE_TO_CREATE_CLIENT).put("clientName", client);
+                throw SeedException.wrap(e, RedisErrorCode.UNABLE_TO_CREATE_CLIENT).put("clientName", clientName);
             }
         }
 
-        if (clients.length == 1) {
-            RedisTransactionMetadataResolver.defaultClient = clients[0];
+        if (!Strings.isNullOrEmpty(redisConfig.getDefaultClient())) {
+            RedisTransactionMetadataResolver.defaultClient = redisConfig.getDefaultClient();
         }
 
-        transactionPlugin.registerTransactionHandler(RedisTransactionHandler.class);
-        transactionPlugin.registerTransactionHandler(RedisPipelinedTransactionHandler.class);
-
         return InitState.INITIALIZED;
+    }
+
+    @Override
+    public Object nativeUnitModule() {
+        return new RedisModule(jedisPools, exceptionHandlerClasses);
     }
 
     @Override
@@ -96,28 +88,7 @@ public class RedisPlugin extends AbstractPlugin {
         }
     }
 
-    @Override
-    public Collection<ClasspathScanRequest> classpathScanRequests() {
-        return classpathScanRequestBuilder().descendentTypeOf(RedisExceptionHandler.class).build();
-    }
-
-    @Override
-    public Collection<Class<?>> requiredPlugins() {
-        return Lists.<Class<?>>newArrayList(ApplicationPlugin.class, TransactionPlugin.class);
-    }
-
-    @Override
-    public Object nativeUnitModule() {
-        return new RedisModule(jedisPools, exceptionHandlerClasses);
-    }
-
-    private JedisPool createJedisPool(Configuration clientConfiguration) {
-        String url = clientConfiguration.getString("url");
-
-        if (url == null || url.isEmpty()) {
-            throw SeedException.createNew(RedisErrorCodes.MISSING_URL_CONFIGURATION);
-        }
-
-        return new JedisPool(new JedisPoolConfig(), url);
+    private JedisPool createJedisPool(RedisConfig.ClientConfig clientConfig) {
+        return new JedisPool(clientConfig.getJedisPoolConfig(), clientConfig.getUrl());
     }
 }

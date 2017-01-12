@@ -16,8 +16,6 @@ import java.lang.annotation.Target;
 /**
  * This annotation accompanies the {@link org.seedstack.seed.transaction.Transactional} annotation to define the
  * transaction as a redis one and specify the concerned redis client.
- *
- * @author adrien.lauer@mpsa.com
  */
 @Target({ElementType.METHOD, ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)

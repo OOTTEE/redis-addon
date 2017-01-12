@@ -8,33 +8,32 @@
 package org.seedstack.redis.internal;
 
 import org.aopalliance.intercept.MethodInvocation;
-import org.seedstack.redis.RedisExceptionHandler;
-import org.seedstack.seed.core.utils.SeedReflectionUtils;
 import org.seedstack.redis.Redis;
+import org.seedstack.redis.RedisExceptionHandler;
 import org.seedstack.seed.transaction.spi.TransactionMetadata;
 import org.seedstack.seed.transaction.spi.TransactionMetadataResolver;
+
+import java.util.Optional;
 
 /**
  * This {@link TransactionMetadataResolver} resolves metadata for transactions marked
  * with {@link Redis}.
- *
- * @author adrien.lauer@mpsa.com
  */
 class RedisTransactionMetadataResolver implements TransactionMetadataResolver {
     static String defaultClient;
 
     @Override
     public TransactionMetadata resolve(MethodInvocation methodInvocation, TransactionMetadata defaults) {
-        Redis redis = SeedReflectionUtils.getMethodOrAncestorMetaAnnotatedWith(methodInvocation.getMethod(), Redis.class);
+        Optional<Redis> redisOptional = RedisResolver.INSTANCE.apply(methodInvocation.getMethod());
 
-        if (redis != null || RedisTransactionHandler.class.equals(defaults.getHandler()) || RedisPipelinedTransactionHandler.class.equals(defaults.getHandler())) {
+        if (redisOptional.isPresent() || RedisTransactionHandler.class.equals(defaults.getHandler()) || RedisPipelinedTransactionHandler.class.equals(defaults.getHandler())) {
             TransactionMetadata result = new TransactionMetadata();
 
             result.setExceptionHandler(RedisExceptionHandler.class);
-            result.setResource(redis == null ? defaultClient : redis.value());
+            result.setResource(redisOptional.isPresent() ? redisOptional.get().value() : defaultClient);
 
-            if (redis != null) {
-                result.setHandler(redis.pipelined() ? RedisPipelinedTransactionHandler.class : RedisTransactionHandler.class);
+            if (redisOptional.isPresent()) {
+                result.setHandler(redisOptional.get().pipelined() ? RedisPipelinedTransactionHandler.class : RedisTransactionHandler.class);
             } else if (RedisTransactionHandler.class.equals(defaults.getHandler())) {
                 result.setHandler(RedisTransactionHandler.class);
             } else if (RedisPipelinedTransactionHandler.class.equals(defaults.getHandler())) {
@@ -42,7 +41,6 @@ class RedisTransactionMetadataResolver implements TransactionMetadataResolver {
             }
 
             return result;
-
         }
 
         return null;

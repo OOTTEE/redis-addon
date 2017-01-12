@@ -7,13 +7,10 @@
  */
 package org.seedstack.redis.internal;
 
-import org.seedstack.seed.ErrorCode;
+import org.seedstack.shed.exception.ErrorCode;
 
-enum RedisErrorCodes implements ErrorCode {
-    // Please keep it sorted
-    ACCESSING_REDIS_OUTSIDE_TRANSACTION, // TODO missing error code
-    MISSING_URL_CONFIGURATION,
+enum RedisErrorCode implements ErrorCode {
+    ACCESSING_REDIS_OUTSIDE_TRANSACTION,
     UNABLE_TO_CLOSE_TRANSACTION,
-    UNABLE_TO_CREATE_CLIENT,
-    UNABLE_TO_LOAD_EXCEPTION_HANDLER_CLASS
+    UNABLE_TO_CREATE_CLIENT
 }

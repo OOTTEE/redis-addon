@@ -68,7 +68,7 @@ class RedisPipelinedTransactionHandler implements org.seedstack.seed.transaction
         try {
             currentTransaction.close();
         } catch (IOException e) {
-            throw SeedException.wrap(e, RedisErrorCodes.UNABLE_TO_CLOSE_TRANSACTION);
+            throw SeedException.wrap(e, RedisErrorCode.UNABLE_TO_CLOSE_TRANSACTION);
         }
     }
 

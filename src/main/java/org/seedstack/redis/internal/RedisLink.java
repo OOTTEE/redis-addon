@@ -26,7 +26,7 @@ class RedisLink<T> implements TransactionalLink<T> {
         Holder holder = perThreadObjectContainer.get().peek();
 
         if (holder == null || holder.transaction == null) {
-            throw SeedException.createNew(RedisErrorCodes.ACCESSING_REDIS_OUTSIDE_TRANSACTION);
+            throw SeedException.createNew(RedisErrorCode.ACCESSING_REDIS_OUTSIDE_TRANSACTION);
         }
 
         return holder.transaction;

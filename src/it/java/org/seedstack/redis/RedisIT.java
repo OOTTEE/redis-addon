@@ -23,16 +23,13 @@ import javax.inject.Named;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class RedisIT extends AbstractSeedIT {
-
     @Inject
-    Transaction transaction;
-
+    private Transaction transaction;
     @Inject
-    Pipeline pipeline;
-
+    private Pipeline pipeline;
     @Inject
     @Named("client1")
-    JedisPool jedisPool;
+    private JedisPool jedisPool;
 
     @Test
     public void redis_is_injectable() {
