@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2013-2016, The SeedStack authors <http://seedstack.org>
+/*
+ * Copyright © 2013-2020, The SeedStack authors <http://seedstack.org>
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -7,12 +7,9 @@
  */
 package org.seedstack.redis.internal;
 
-import org.seedstack.seed.SeedException;
 import org.seedstack.seed.transaction.spi.TransactionMetadata;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.Pipeline;
-
-import java.io.IOException;
 
 
 class RedisPipelinedTransactionHandler implements org.seedstack.seed.transaction.spi.TransactionHandler<Pipeline> {
@@ -65,11 +62,7 @@ class RedisPipelinedTransactionHandler implements org.seedstack.seed.transaction
 
     @Override
     public void doReleaseTransaction(Pipeline currentTransaction) {
-        try {
-            currentTransaction.close();
-        } catch (IOException e) {
-            throw SeedException.wrap(e, RedisErrorCode.UNABLE_TO_CLOSE_TRANSACTION);
-        }
+        currentTransaction.close();
     }
 
     @Override

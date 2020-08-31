@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2013-2016, The SeedStack authors <http://seedstack.org>
+/*
+ * Copyright © 2013-2020, The SeedStack authors <http://seedstack.org>
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -7,7 +7,6 @@
  */
 package org.seedstack.redis.internal;
 
-import com.google.common.base.Strings;
 import io.nuun.kernel.api.plugin.InitState;
 import io.nuun.kernel.api.plugin.context.InitContext;
 import io.nuun.kernel.api.plugin.request.ClasspathScanRequest;
@@ -35,7 +34,9 @@ public class RedisPlugin extends AbstractSeedPlugin {
 
     @Override
     public Collection<ClasspathScanRequest> classpathScanRequests() {
-        return classpathScanRequestBuilder().descendentTypeOf(RedisExceptionHandler.class).build();
+        return classpathScanRequestBuilder()
+                .subtypeOf(RedisExceptionHandler.class)
+                .build();
     }
 
     @Override
@@ -62,10 +63,6 @@ public class RedisPlugin extends AbstractSeedPlugin {
             } catch (Exception e) {
                 throw SeedException.wrap(e, RedisErrorCode.UNABLE_TO_CREATE_CLIENT).put("clientName", clientName);
             }
-        }
-
-        if (!Strings.isNullOrEmpty(redisConfig.getDefaultClient())) {
-            RedisTransactionMetadataResolver.defaultClient = redisConfig.getDefaultClient();
         }
 
         return InitState.INITIALIZED;

@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2013-2016, The SeedStack authors <http://seedstack.org>
+/*
+ * Copyright © 2013-2020, The SeedStack authors <http://seedstack.org>
  *
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -7,9 +7,9 @@
  */
 package org.seedstack.redis;
 
-import org.hibernate.validator.constraints.NotBlank;
 import org.seedstack.coffig.Config;
 import org.seedstack.coffig.SingleValue;
+import org.seedstack.seed.validation.NotBlank;
 import redis.clients.jedis.JedisPoolConfig;
 
 import javax.validation.constraints.NotNull;
