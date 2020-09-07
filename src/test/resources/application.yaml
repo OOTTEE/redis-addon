@@ -9,6 +9,6 @@
 redis:
   clients:
     client1:
-      uri: redis://localhost:6377/3
+      uri: redis://localhost:6379/3
       poolConfig:
         minIdle: 2
