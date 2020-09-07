@@ -11,8 +11,11 @@ import org.seedstack.coffig.Config;
 import org.seedstack.coffig.SingleValue;
 import org.seedstack.seed.validation.NotBlank;
 import redis.clients.jedis.JedisPoolConfig;
+import redis.clients.jedis.Protocol;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,26 +46,37 @@ public class RedisConfig {
     public static class ClientConfig {
         @NotBlank
         @SingleValue
-        private String url;
+        private URI uri;
         @NotNull
-        private JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
+        private JedisPoolConfig poolConfig = new JedisPoolConfig();
+        @Min(0)
+        private int timeout = Protocol.DEFAULT_TIMEOUT;
         private Class<? extends RedisExceptionHandler> exceptionHandler;
 
-        public String getUrl() {
-            return url;
+        public URI getUri() {
+            return uri;
         }
 
-        public ClientConfig setUrl(String url) {
-            this.url = url;
+        public ClientConfig setUri(URI uri) {
+            this.uri = uri;
             return this;
         }
 
-        public JedisPoolConfig getJedisPoolConfig() {
-            return jedisPoolConfig;
+        public JedisPoolConfig getPoolConfig() {
+            return poolConfig;
         }
 
-        public ClientConfig setJedisPoolConfig(JedisPoolConfig jedisPoolConfig) {
-            this.jedisPoolConfig = jedisPoolConfig;
+        public ClientConfig setPoolConfig(JedisPoolConfig poolConfig) {
+            this.poolConfig = poolConfig;
+            return this;
+        }
+
+        public int getTimeout() {
+            return timeout;
+        }
+
+        public ClientConfig setTimeout(int timeout) {
+            this.timeout = timeout;
             return this;
         }
 

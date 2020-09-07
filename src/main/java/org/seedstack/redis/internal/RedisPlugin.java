@@ -7,6 +7,7 @@
  */
 package org.seedstack.redis.internal;
 
+import com.google.common.collect.Lists;
 import io.nuun.kernel.api.plugin.InitState;
 import io.nuun.kernel.api.plugin.context.InitContext;
 import io.nuun.kernel.api.plugin.request.ClasspathScanRequest;
@@ -14,10 +15,12 @@ import org.seedstack.redis.RedisConfig;
 import org.seedstack.redis.RedisExceptionHandler;
 import org.seedstack.seed.SeedException;
 import org.seedstack.seed.core.internal.AbstractSeedPlugin;
+import org.seedstack.seed.crypto.spi.SSLProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.JedisPool;
 
+import javax.net.ssl.SSLContext;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +33,11 @@ public class RedisPlugin extends AbstractSeedPlugin {
     @Override
     public String name() {
         return "redis";
+    }
+
+    @Override
+    protected Collection<Class<?>> dependencies() {
+        return Lists.newArrayList(SSLProvider.class);
     }
 
     @Override
@@ -59,7 +67,7 @@ public class RedisPlugin extends AbstractSeedPlugin {
             }
 
             try {
-                jedisPools.put(clientName, createJedisPool(clientConfig));
+                jedisPools.put(clientName, createJedisPool(clientConfig, initContext.dependency(SSLProvider.class)));
             } catch (Exception e) {
                 throw SeedException.wrap(e, RedisErrorCode.UNABLE_TO_CREATE_CLIENT).put("clientName", clientName);
             }
@@ -85,7 +93,19 @@ public class RedisPlugin extends AbstractSeedPlugin {
         }
     }
 
-    private JedisPool createJedisPool(RedisConfig.ClientConfig clientConfig) {
-        return new JedisPool(clientConfig.getJedisPoolConfig(), clientConfig.getUrl());
+    private JedisPool createJedisPool(RedisConfig.ClientConfig clientConfig, SSLProvider sslProvider) {
+        if (sslProvider.sslContext().isPresent()) {
+            SSLContext sslContext = sslProvider.sslContext().get();
+            return new JedisPool(
+                    clientConfig.getPoolConfig(),
+                    clientConfig.getUri(),
+                    clientConfig.getTimeout(),
+                    sslContext.getSocketFactory(),
+                    sslContext.getSupportedSSLParameters(),
+                    null // default
+            );
+        } else {
+            return new JedisPool(clientConfig.getPoolConfig(), clientConfig.getUri(), clientConfig.getTimeout());
+        }
     }
 }

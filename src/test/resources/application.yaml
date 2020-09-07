@@ -9,6 +9,6 @@
 redis:
   clients:
     client1:
-      url: localhost
-      jedisPoolConfig:
+      uri: redis://localhost:6377/3
+      poolConfig:
         minIdle: 2

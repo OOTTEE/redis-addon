@@ -1,3 +1,9 @@
+# Version 2.0.2 (2020-08-31)
+
+* [brk] Renamed `url` config option to `uri`. The user, password, port and db can be specified directly in this URI (`redis://[[username:]password@]host[:port][/database]`).
+* [new] SeedStack SSL context is used for SSL connections. 
+* [new] New configuration options.
+
 # Version 2.0.1 (2020-08-31)
 
 * [chg] Update Jedis to 3.3.0
